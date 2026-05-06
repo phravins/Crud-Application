@@ -1,0 +1,90 @@
+<div class="relative overflow-hidden bg-base-100 py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:mx-0">
+      <h2 class="text-4xl font-bold tracking-tight text-base-content sm:text-6xl">Business Intelligence Platform</h2>
+      <p class="mt-6 text-lg leading-8 text-base-content/70">
+        Securely store, organize, and analyze your business data. Whether it's structured sales reports or unordered operational logs, our platform turns your data into actionable insights.
+      </p>
+    </div>
+    <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
+      <%= if @current_scope && @current_scope.user do %>
+        <.link navigate={~p"/records"} class="btn btn-primary btn-lg w-full sm:w-auto">
+          Go to Dashboard <span aria-hidden="true">&rarr;</span>
+        </.link>
+      <% else %>
+        <.link navigate={~p"/users/register"} class="btn btn-primary btn-lg w-full sm:w-auto">
+          Get Started <span aria-hidden="true">&rarr;</span>
+        </.link>
+      <% end %>
+    </div>
+    <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-4 mt-6">
+      <.link navigate={~p"/records"} class="group flex items-center gap-2 text-sm font-semibold">
+        Manage Records <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+      </.link>
+      <.link navigate={~p"/analytics"} class="group flex items-center gap-2 text-sm font-semibold">
+        View Analytics <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+      </.link>
+    </div>
+    <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
+        <dt class="text-base leading-7 text-base-content/60">Data Connectivity</dt>
+        <dd class="text-3xl font-bold tracking-tight text-primary">PostgreSQL</dd>
+      </div>
+      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
+        <dt class="text-base leading-7 text-base-content/60">Visualization</dt>
+        <dd class="text-3xl font-bold tracking-tight text-secondary">Metabase Ready</dd>
+      </div>
+      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
+        <dt class="text-base leading-7 text-base-content/60">Security</dt>
+        <dd class="text-3xl font-bold tracking-tight text-accent">Encrypted Auth</dd>
+      </div>
+      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
+        <dt class="text-base leading-7 text-base-content/60">Updates</dt>
+        <dd class="text-3xl font-bold tracking-tight">Real-time</dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+<div class="bg-base-200 py-24 sm:py-32 rounded-3xl mx-4 lg:mx-8 mb-8">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl lg:text-center">
+      <h2 class="text-base font-semibold leading-7 text-primary">Powerful Processing</h2>
+      <p class="mt-2 text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Everything you need to manage business data</p>
+      <p class="mt-6 text-lg leading-8 text-base-content/70">
+        Our platform handles the complexity of data storage so you can focus on making decisions.
+      </p>
+    </div>
+    <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
+            <.icon name="hero-cloud-arrow-up" class="size-5 text-primary" />
+            Flexible Storage
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
+            <p class="flex-auto">Store any key-value pairs in our JSONB-powered metadata field. No fixed schema required for your custom business data.</p>
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
+            <.icon name="hero-chart-pie" class="size-5 text-primary" />
+            Built-in Analytics
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
+            <p class="flex-auto">Instantly see distributions and trends across your records with our automated analytics engine.</p>
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
+            <.icon name="hero-lock-closed" class="size-5 text-primary" />
+            Enterprise Security
+          </dt>
+          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
+            <p class="flex-auto">Your data is isolated and secured with robust authentication and authorization protocols.</p>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
