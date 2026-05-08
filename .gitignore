@@ -35,3 +35,4 @@ crud_app-*.tar
 npm-debug.log
 /assets/node_modules/
 
+\n# Secrets\n.env\nconfig/*.secret.exs
