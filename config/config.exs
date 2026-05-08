@@ -73,6 +73,14 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Metabase Analytics Config
+# Get your public token from: Metabase → Your Dashboard → Share → Enable public link
+# The token is the hash at the end of the public URL.
+config :crud_app, :metabase,
+  site_url: System.get_env("METABASE_URL"),
+  secret_key: System.get_env("METABASE_SECRET_KEY"),
+  dashboard_id: 3
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
