@@ -38,26 +38,29 @@ defmodule CrudAppWeb.TaskLive.Form do
   defp return_to(_), do: "index"
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    task = Management.get_task!(id)
+    scope = socket.assigns.current_scope
+    task = Management.get_task!(scope, id)
 
     socket
     |> assign(:page_title, "Edit Task")
     |> assign(:task, task)
-    |> assign(:form, to_form(Management.change_task(task)))
+    |> assign(:form, to_form(Management.change_task(scope, task)))
   end
 
   defp apply_action(socket, :new, _params) do
+    scope = socket.assigns.current_scope
     task = %Task{}
 
     socket
     |> assign(:page_title, "New Task")
     |> assign(:task, task)
-    |> assign(:form, to_form(Management.change_task(task)))
+    |> assign(:form, to_form(Management.change_task(scope, task)))
   end
 
   @impl true
   def handle_event("validate", %{"task" => task_params}, socket) do
-    changeset = Management.change_task(socket.assigns.task, task_params)
+    scope = socket.assigns.current_scope
+    changeset = Management.change_task(scope, socket.assigns.task, task_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -66,7 +69,8 @@ defmodule CrudAppWeb.TaskLive.Form do
   end
 
   defp save_task(socket, :edit, task_params) do
-    case Management.update_task(socket.assigns.task, task_params) do
+    scope = socket.assigns.current_scope
+    case Management.update_task(scope, socket.assigns.task, task_params) do
       {:ok, task} ->
         {:noreply,
          socket
@@ -79,7 +83,8 @@ defmodule CrudAppWeb.TaskLive.Form do
   end
 
   defp save_task(socket, :new, task_params) do
-    case Management.create_task(task_params) do
+    scope = socket.assigns.current_scope
+    case Management.create_task(scope, task_params) do
       {:ok, task} ->
         {:noreply,
          socket
