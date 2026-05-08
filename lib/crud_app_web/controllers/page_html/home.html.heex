@@ -1,87 +1,108 @@
-<div class="relative overflow-hidden bg-base-100 py-24 sm:py-32">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl lg:mx-0">
-      <h2 class="text-4xl font-bold tracking-tight text-base-content sm:text-6xl">Business Intelligence Platform</h2>
-      <p class="mt-6 text-lg leading-8 text-base-content/70">
-        Securely store, organize, and analyze your business data. Whether it's structured sales reports or unordered operational logs, our platform turns your data into actionable insights.
+<div class="relative overflow-hidden bg-base-100 min-h-screen flex flex-col">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
+    <div class="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#b32025] to-[#252525] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-6 lg:px-8 pt-20 pb-24 sm:pt-32 sm:pb-32 flex-grow flex items-center">
+    <div class="mx-auto max-w-3xl text-center">
+      <div class="hidden sm:mb-8 sm:flex sm:justify-center">
+        <div class="relative rounded-full px-3 py-1 text-sm leading-6 text-base-content/70 ring-1 ring-base-content/10 hover:ring-base-content/20 transition-all duration-300">
+          Announcing our next generation business analytics. <a href="#" class="font-semibold text-primary"><span class="absolute inset-0" aria-hidden="true"></span>Read more <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+      <h1 class="text-5xl font-extrabold tracking-tight text-base-content sm:text-7xl mb-8">
+        Intelligent Data for <br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#b32025] to-[#f05055]">Real Businesses</span>
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-base-content/70 max-w-2xl mx-auto">
+        Securely store, organize, and analyze your business data. Whether it's structured sales reports or unordered operational logs, our platform turns your data into actionable insights instantly.
       </p>
-    </div>
-    <div class="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-      <%= if @current_scope && @current_scope.user do %>
-        <.link navigate={~p"/records"} class="btn btn-primary btn-lg w-full sm:w-auto">
-          Go to Dashboard <span aria-hidden="true">&rarr;</span>
-        </.link>
-      <% else %>
-        <.link navigate={~p"/users/register"} class="btn btn-primary btn-lg w-full sm:w-auto">
-          Get Started <span aria-hidden="true">&rarr;</span>
-        </.link>
-      <% end %>
-    </div>
-    <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-4 mt-6">
-      <.link navigate={~p"/records"} class="group flex items-center gap-2 text-sm font-semibold">
-        Manage Records <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-      </.link>
-      <.link navigate={~p"/analytics"} class="group flex items-center gap-2 text-sm font-semibold">
-        View Analytics <span aria-hidden="true" class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-      </.link>
-    </div>
-    <dl class="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
-        <dt class="text-base leading-7 text-base-content/60">Data Connectivity</dt>
-        <dd class="text-3xl font-bold tracking-tight text-primary">PostgreSQL</dd>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <%= if @current_scope && @current_scope.user do %>
+          <.link navigate={~p"/records"} class="btn btn-primary btn-lg shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all rounded-sm px-8">
+            Go to Dashboard
+          </.link>
+          <.link navigate={~p"/analytics"} class="text-sm font-semibold leading-6 text-base-content hover:text-primary transition-colors group">
+            View Analytics <span aria-hidden="true" class="group-hover:translate-x-1 inline-block transition-transform duration-200">&rarr;</span>
+          </.link>
+        <% else %>
+          <.link navigate={~p"/users/register"} class="btn btn-primary btn-lg shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all rounded-sm px-8">
+            Get Started Free
+          </.link>
+          <.link navigate={~p"/users/log-in"} class="text-sm font-semibold leading-6 text-base-content hover:text-primary transition-colors group">
+            Sign In <span aria-hidden="true" class="group-hover:translate-x-1 inline-block transition-transform duration-200">&rarr;</span>
+          </.link>
+        <% end %>
       </div>
-      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
-        <dt class="text-base leading-7 text-base-content/60">Visualization</dt>
-        <dd class="text-3xl font-bold tracking-tight text-secondary">Metabase Ready</dd>
+    </div>
+  </div>
+
+  <!-- Feature metrics -->
+  <div class="mx-auto max-w-7xl px-6 lg:px-8 pb-24">
+    <dl class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 text-center">
+      <div class="mx-auto flex max-w-xs flex-col gap-y-3 group">
+        <dt class="text-base leading-7 text-base-content/60 group-hover:text-base-content/80 transition-colors">Data Connectivity</dt>
+        <dd class="order-first text-3xl font-bold tracking-tight text-base-content sm:text-4xl group-hover:scale-105 transition-transform duration-300">PostgreSQL</dd>
       </div>
-      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
-        <dt class="text-base leading-7 text-base-content/60">Security</dt>
-        <dd class="text-3xl font-bold tracking-tight text-accent">Encrypted Auth</dd>
+      <div class="mx-auto flex max-w-xs flex-col gap-y-3 group">
+        <dt class="text-base leading-7 text-base-content/60 group-hover:text-base-content/80 transition-colors">Visualization</dt>
+        <dd class="order-first text-3xl font-bold tracking-tight text-primary sm:text-4xl group-hover:scale-105 transition-transform duration-300">Metabase</dd>
       </div>
-      <div class="flex flex-col-reverse gap-y-4 border-l border-base-300 pl-6">
-        <dt class="text-base leading-7 text-base-content/60">Updates</dt>
-        <dd class="text-3xl font-bold tracking-tight">Real-time</dd>
+      <div class="mx-auto flex max-w-xs flex-col gap-y-3 group">
+        <dt class="text-base leading-7 text-base-content/60 group-hover:text-base-content/80 transition-colors">Security</dt>
+        <dd class="order-first text-3xl font-bold tracking-tight text-base-content sm:text-4xl group-hover:scale-105 transition-transform duration-300">Encrypted Auth</dd>
+      </div>
+      <div class="mx-auto flex max-w-xs flex-col gap-y-3 group">
+        <dt class="text-base leading-7 text-base-content/60 group-hover:text-base-content/80 transition-colors">Updates</dt>
+        <dd class="order-first text-3xl font-bold tracking-tight text-base-content sm:text-4xl group-hover:scale-105 transition-transform duration-300">Real-time</dd>
       </div>
     </dl>
   </div>
 </div>
 
-<div class="bg-base-200 py-24 sm:py-32 rounded-3xl mx-4 lg:mx-8 mb-8">
+<div class="bg-base-200/50 py-24 sm:py-32 border-t border-base-300">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl lg:text-center">
-      <h2 class="text-base font-semibold leading-7 text-primary">Powerful Processing</h2>
+      <h2 class="text-base font-semibold leading-7 text-primary tracking-wide uppercase">Powerful Processing</h2>
       <p class="mt-2 text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Everything you need to manage business data</p>
       <p class="mt-6 text-lg leading-8 text-base-content/70">
-        Our platform handles the complexity of data storage so you can focus on making decisions.
+        Our platform handles the complexity of data storage so you can focus on making decisions and driving your SME forward.
       </p>
     </div>
     <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
       <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
-            <.icon name="hero-cloud-arrow-up" class="size-5 text-primary" />
+        <div class="flex flex-col bg-base-100 p-8 rounded-2xl shadow-sm border border-base-300 hover:shadow-md hover:border-primary/30 transition-all duration-300">
+          <dt class="flex items-center gap-x-3 text-lg font-semibold leading-7 text-base-content mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <.icon name="hero-cloud-arrow-up" class="size-6 text-primary" />
+            </div>
             Flexible Storage
           </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
+          <dd class="flex flex-auto flex-col text-base leading-7 text-base-content/70">
             <p class="flex-auto">Store any key-value pairs in our JSONB-powered metadata field. No fixed schema required for your custom business data.</p>
           </dd>
         </div>
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
-            <.icon name="hero-chart-pie" class="size-5 text-primary" />
+        <div class="flex flex-col bg-base-100 p-8 rounded-2xl shadow-sm border border-base-300 hover:shadow-md hover:border-primary/30 transition-all duration-300">
+          <dt class="flex items-center gap-x-3 text-lg font-semibold leading-7 text-base-content mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <.icon name="hero-chart-pie" class="size-6 text-primary" />
+            </div>
             Built-in Analytics
           </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
+          <dd class="flex flex-auto flex-col text-base leading-7 text-base-content/70">
             <p class="flex-auto">Instantly see distributions and trends across your records with our automated analytics engine.</p>
           </dd>
         </div>
-        <div class="flex flex-col">
-          <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-base-content">
-            <.icon name="hero-lock-closed" class="size-5 text-primary" />
+        <div class="flex flex-col bg-base-100 p-8 rounded-2xl shadow-sm border border-base-300 hover:shadow-md hover:border-primary/30 transition-all duration-300">
+          <dt class="flex items-center gap-x-3 text-lg font-semibold leading-7 text-base-content mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <.icon name="hero-lock-closed" class="size-6 text-primary" />
+            </div>
             Enterprise Security
           </dt>
-          <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-base-content/70">
-            <p class="flex-auto">Your data is isolated and secured with robust authentication and authorization protocols.</p>
+          <dd class="flex flex-auto flex-col text-base leading-7 text-base-content/70">
+            <p class="flex-auto">Your data is isolated and secured with robust authentication and authorization protocols ensuring full compliance.</p>
           </dd>
         </div>
       </dl>
