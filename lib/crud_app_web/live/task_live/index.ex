@@ -48,18 +48,19 @@ defmodule CrudAppWeb.TaskLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Listing Tasks")
-     |> stream(:tasks, list_tasks())}
+     |> stream(:tasks, list_tasks(socket.assigns.current_scope))}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    task = Management.get_task!(id)
-    {:ok, _} = Management.delete_task(task)
+    scope = socket.assigns.current_scope
+    task = Management.get_task!(scope, id)
+    {:ok, _} = Management.delete_task(scope, task)
 
     {:noreply, stream_delete(socket, :tasks, task)}
   end
 
-  defp list_tasks() do
-    Management.list_tasks()
+  defp list_tasks(scope) do
+    Management.list_tasks(scope)
   end
 end
