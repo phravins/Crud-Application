@@ -7,15 +7,15 @@ defmodule CrudApp.Business.Record do
     field :category, :string
     field :metadata, :map
     field :user_id, :id
+    field :user_email, :string
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(record, attrs, user_scope) do
+  def changeset(record, attrs) do
     record
     |> cast(attrs, [:name, :category, :metadata])
     |> validate_required([:name, :category])
-    |> put_change(:user_id, user_scope.user.id)
   end
 end
