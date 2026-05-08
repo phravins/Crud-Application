@@ -6,6 +6,8 @@ defmodule CrudApp.Management.Task do
     field :title, :string
     field :description, :string
     field :status, :string
+    field :assigned_to, :id
+    field :user_email, :string
 
     timestamps(type: :utc_datetime)
   end
