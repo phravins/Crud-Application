@@ -1,63 +1,10 @@
 defmodule CrudAppWeb.AnalyticsLive do
   use CrudAppWeb, :live_view
 
-  alias CrudApp.Business
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <div class="space-y-8">
-      <.header>
-        Business Analytics
-        <:subtitle>Aggregated insights from your business records.</:subtitle>
-      </.header>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="stats shadow bg-base-200">
-          <div class="stat">
-            <div class="stat-title">Total Records</div>
-            <div class="stat-value text-primary">{@total_records}</div>
-            <div class="stat-desc">Across all categories</div>
-          </div>
-        </div>
-
-        <div class="stats shadow bg-base-200" :for={{category, count} <- @category_distribution}>
-          <div class="stat">
-            <div class="stat-title">{category}</div>
-            <div class="stat-value text-secondary">{count}</div>
-            <div class="stat-desc">Records in this category</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card bg-base-200 shadow-xl mt-8">
-        <div class="card-body">
-          <h2 class="card-title text-xl mb-4">Unordered Data Analysis</h2>
-          <p class="text-sm opacity-70 mb-4">Below is a breakdown of custom metadata fields found across your records.</p>
-          
-          <div class="overflow-x-auto">
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th>Field Key</th>
-                  <th>Occurrences</th>
-                  <th>Example Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr :for={{key, count, example} <- @metadata_insights}>
-                  <td class="font-mono text-primary">{key}</td>
-                  <td>{count}</td>
-                  <td class="italic opacity-80">{example}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    """
-  end
+  alias CrudApp.Accounting
+  alias CrudApp.Operations
+  alias CrudApp.CRM
+  alias CrudApp.Inventory
 
   @impl true
   def render(assigns) do
@@ -66,11 +13,11 @@ defmodule CrudAppWeb.AnalyticsLive do
       <div class="flex justify-between items-center mb-8">
         <.header>
           Business Analytics Dashboard
-          <:subtitle>Real-time insights and data visualizations.</:subtitle>
+          <:subtitle>Real-time insights across your ERP domains.</:subtitle>
         </.header>
         <div class="flex gap-2">
           <button 
-            onclick="window.print()" 
+            phx-click={JS.dispatch("phx:prepare-print")}
             class="btn btn-outline btn-secondary no-print"
           >
             <.icon name="hero-arrow-down-tray" /> Export PDF
@@ -80,19 +27,47 @@ defmodule CrudAppWeb.AnalyticsLive do
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="stats shadow bg-base-200">
+        <div class="stats shadow bg-base-200 border-t-4 border-[#10b981]">
           <div class="stat">
-            <div class="stat-title text-sm opacity-70">Total Records</div>
-            <div class="stat-value text-primary">{@total_records}</div>
-            <div class="stat-desc">Data Points Collected</div>
+            <div class="stat-figure text-[#10b981]">
+              <.icon name="hero-arrow-trending-up" class="w-8 h-8" />
+            </div>
+            <div class="stat-title text-sm opacity-70">Finance (Income)</div>
+            <div class="stat-value text-[#10b981]">{@counts.incomes}</div>
+            <div class="stat-desc">Total Revenue Records</div>
+          </div>
+        </div>
+        
+        <div class="stats shadow bg-base-200 border-t-4 border-[#ef4444]">
+          <div class="stat">
+            <div class="stat-figure text-[#ef4444]">
+              <.icon name="hero-banknotes" class="w-8 h-8" />
+            </div>
+            <div class="stat-title text-sm opacity-70">Finance (Expenses)</div>
+            <div class="stat-value text-[#ef4444]">{@counts.expenses}</div>
+            <div class="stat-desc">Total Expense Records</div>
           </div>
         </div>
 
-        <div class="stats shadow bg-base-200" :for={{category, count} <- Enum.take(@category_distribution, 3)}>
+        <div class="stats shadow bg-base-200 border-t-4 border-[#3b82f6]">
           <div class="stat">
-            <div class="stat-title text-sm opacity-70">{category}</div>
-            <div class="stat-value text-secondary">{count}</div>
-            <div class="stat-desc">Active Entries</div>
+            <div class="stat-figure text-[#3b82f6]">
+              <.icon name="hero-clipboard-document-check" class="w-8 h-8" />
+            </div>
+            <div class="stat-title text-sm opacity-70">Operations (Tasks)</div>
+            <div class="stat-value text-[#3b82f6]">{@counts.tasks}</div>
+            <div class="stat-desc">Active Tasks</div>
+          </div>
+        </div>
+
+        <div class="stats shadow bg-base-200 border-t-4 border-[#8b5cf6]">
+          <div class="stat">
+            <div class="stat-figure text-[#8b5cf6]">
+              <.icon name="hero-users" class="w-8 h-8" />
+            </div>
+            <div class="stat-title text-sm opacity-70">Sales (Clients)</div>
+            <div class="stat-value text-[#8b5cf6]">{@counts.clients}</div>
+            <div class="stat-desc">Total Clients CRM</div>
           </div>
         </div>
       </div>
@@ -101,64 +76,65 @@ defmodule CrudAppWeb.AnalyticsLive do
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
         <div class="card bg-base-100 shadow-xl border border-base-300">
           <div class="card-body">
-            <h2 class="card-title text-lg mb-6">Record Distribution by Category</h2>
+            <h2 class="card-title text-lg mb-6">ERP Domain Data Volume</h2>
             <div class="h-[300px] w-full">
               <canvas 
-                id="category-chart" 
+                id="domain-chart" 
                 phx-hook="Chart" 
-                data-config={Jason.encode!(@category_chart_config)}
+                data-config={Jason.encode!(@domain_chart_config)}
               ></canvas>
             </div>
           </div>
         </div>
 
+        <!-- Metabase Configuration Insight -->
         <div class="card bg-base-100 shadow-xl border border-base-300">
           <div class="card-body">
-            <h2 class="card-title text-lg mb-6">Metadata Field Prevalence</h2>
-            <div class="h-[300px] w-full">
-              <canvas 
-                id="metadata-chart" 
-                phx-hook="Chart" 
-                data-config={Jason.encode!(@metadata_chart_config)}
-              ></canvas>
+            <h2 class="card-title text-lg mb-4 text-[#b32025]">Metabase High-Fidelity Analytics</h2>
+            <p class="text-sm opacity-80 mb-4">
+              To achieve accurate, real-time financial reporting (e.g., Net Balance tracking, Income vs Expenses over time) and CRM pipeline analysis, connect Metabase to this database.
+            </p>
+            <ul class="list-disc list-inside text-sm opacity-80 space-y-2 mb-4">
+              <li><span class="font-bold text-[#10b981]">Finance Domain:</span> Create Metabase Questions tracking `incomes` against `expenses` to generate Net Balance charts.</li>
+              <li><span class="font-bold text-[#8b5cf6]">Sales Domain:</span> Track `clients` acquisition over time.</li>
+              <li><span class="font-bold text-[#3b82f6]">Ops Domain:</span> Track `tasks` completion velocity.</li>
+            </ul>
+            <div class="mt-auto">
+              <a href="https://www.metabase.com/" target="_blank" class="btn btn-outline btn-sm">Configure in Metabase</a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Detailed Analysis Table -->
+      <!-- Metabase Embedded Dashboard Section -->
       <div class="card bg-base-100 shadow-xl border border-base-300 mt-12 overflow-hidden">
         <div class="card-body p-0">
-          <div class="bg-base-200 p-6">
-            <h2 class="card-title text-xl">Unordered Data Insights</h2>
-            <p class="text-sm opacity-70">Discovery of custom schema-less fields within your business records.</p>
+          <div class="bg-base-200 p-6 border-b border-base-300">
+            <h2 class="card-title text-xl text-[#b32025]">
+              <.icon name="hero-presentation-chart-line" class="w-6 h-6 mr-2" />
+              Advanced Analytics (Powered by Metabase)
+            </h2>
+            <p class="text-sm opacity-70">Embed your exact Sales, Finance, or Operations Metabase dashboard here.</p>
           </div>
           
-          <div class="overflow-x-auto p-6">
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th>Field Key</th>
-                  <th>Occurrences</th>
-                  <th>Example Value</th>
-                  <th>Coverage</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr :for={{key, count, example} <- @metadata_insights}>
-                  <td class="font-mono text-primary font-bold">{key}</td>
-                  <td>
-                    <div class="badge badge-outline">{count} records</div>
-                  </td>
-                  <td class="italic opacity-80">{example}</td>
-                  <td>
-                    <div class="w-full bg-base-200 rounded-full h-1.5">
-                      <div class="bg-primary h-1.5 rounded-full" style={"width: #{count * 100 / max(@total_records, 1)}%"}></div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="w-full bg-base-100 p-2 relative metabase-container" style="height: 700px;">
+            <%= if @metabase_iframe_url do %>
+              <iframe
+                  src={@metabase_iframe_url}
+                  frameborder="0"
+                  width="100%"
+                  height="100%"
+                  allowtransparency
+              ></iframe>
+            <% else %>
+              <div class="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-base-300 rounded-lg">
+                <.icon name="hero-chart-bar-square" class="w-16 h-16 text-base-content/20 mb-4" />
+                <h3 class="text-lg font-semibold text-base-content/80">Metabase Dashboard Not Configured</h3>
+                <p class="text-sm text-base-content/60 max-w-md text-center mt-2">
+                  Once you build your domain-specific dashboards in Metabase, paste the public or signed embed URL into the configuration (`config/dev.exs`) to see your accurate sales and finance graphs here.
+                </p>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>
@@ -168,27 +144,33 @@ defmodule CrudAppWeb.AnalyticsLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    records = Business.list_records(socket.assigns.current_scope)
-    total_records = length(records)
+    scope = socket.assigns.current_scope
     
-    # 1. Category Distribution
-    category_counts = 
-      records 
-      |> Enum.group_by(& &1.category) 
-      |> Enum.map(fn {cat, list} -> {cat || "Uncategorized", length(list)} end)
-      |> Enum.sort_by(fn {_, count} -> count end, :desc)
+    # Fetch accurate counts from ERP tables scoped to current user
+    incomes_count = length(Accounting.list_incomes(scope))
+    expenses_count = length(Accounting.list_expenses(scope))
+    tasks_count = length(Operations.list_tasks(scope))
+    clients_count = length(CRM.list_clients(scope))
+    products_count = length(Inventory.list_products(scope))
+    
+    counts = %{
+      incomes: incomes_count,
+      expenses: expenses_count,
+      tasks: tasks_count,
+      clients: clients_count,
+      products: products_count
+    }
 
-    category_labels = Enum.map(category_counts, &elem(&1, 0))
-    category_data = Enum.map(category_counts, &elem(&1, 1))
-
-    category_chart_config = %{
+    # ERP Domain Chart with distinct colors for Sales, Finance, Ops
+    domain_chart_config = %{
       type: "doughnut",
       data: %{
-        labels: category_labels,
+        labels: ["Finance (Income)", "Finance (Expenses)", "Operations (Tasks)", "Sales (Clients)", "Inventory"],
         datasets: [%{
-          label: "Records",
-          data: category_data,
-          backgroundColor: ["#570df8", "#f000b8", "#37cdbe", "#3d4451", "#ff9900"],
+          label: "Data Volume",
+          data: [incomes_count, expenses_count, tasks_count, clients_count, products_count],
+          # Distinct domain colors
+          backgroundColor: ["#10b981", "#ef4444", "#3b82f6", "#8b5cf6", "#f59e0b"],
           borderWidth: 0
         }]
       },
@@ -196,57 +178,24 @@ defmodule CrudAppWeb.AnalyticsLive do
         responsive: true,
         maintainAspectRatio: false,
         plugins: %{
-          legend: %{ position: "bottom" }
+          legend: %{ position: "right" }
         }
       }
     }
 
-    # 2. Metadata Insights
-    metadata_insights = 
-      records
-      |> Enum.flat_map(fn r -> Map.keys(r.metadata || %{}) end)
-      |> Enum.frequencies()
-      |> Enum.map(fn {key, count} -> 
-        example_record = Enum.find(records, fn r -> Map.has_key?(r.metadata || %{}, key) end)
-        example_value = example_record.metadata[key]
-        {key, count, inspect(example_value)}
-      end)
-      |> Enum.sort_by(fn {_, count, _} -> count end, :desc)
-
-    metadata_labels = Enum.map(Enum.take(metadata_insights, 5), &elem(&1, 0))
-    metadata_data = Enum.map(Enum.take(metadata_insights, 5), &elem(&1, 1))
-
-    metadata_chart_config = %{
-      type: "bar",
-      data: %{
-        labels: metadata_labels,
-        datasets: [%{
-          label: "Field Frequency",
-          data: metadata_data,
-          backgroundColor: "#570df8",
-          borderRadius: 8
-        }]
-      },
-      options: %{
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: %{
-          y: %{ beginAtZero: true, grid: %{ display: false } },
-          x: %{ grid: %{ display: false } }
-        },
-        plugins: %{
-          legend: %{ display: false }
-        }
-      }
-    }
+    # Generate secure signed JWT URL for Metabase embedding
+    metabase_url =
+      try do
+        CrudApp.Metabase.dashboard_url(scope.user.id, scope.user.email)
+      rescue
+        _ -> nil
+      end
 
     {:ok, 
      socket
      |> assign(:page_title, "Analytics Dashboard")
-     |> assign(:total_records, total_records)
-     |> assign(:category_distribution, category_counts)
-     |> assign(:metadata_insights, metadata_insights)
-     |> assign(:category_chart_config, category_chart_config)
-     |> assign(:metadata_chart_config, metadata_chart_config)}
+     |> assign(:counts, counts)
+     |> assign(:domain_chart_config, domain_chart_config)
+     |> assign(:metabase_iframe_url, metabase_url)}
   end
 end
