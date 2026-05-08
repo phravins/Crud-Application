@@ -21,11 +21,6 @@ defmodule CrudAppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-
-    live "/tasks", TaskLive.Index, :index
-    live "/tasks/new", TaskLive.Form, :new
-    live "/tasks/:id", TaskLive.Show, :show
-    live "/tasks/:id/edit", TaskLive.Form, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -64,6 +59,31 @@ defmodule CrudAppWeb.Router do
       live "/records/new", RecordLive.Form, :new
       live "/records/:id", RecordLive.Show, :show
       live "/records/:id/edit", RecordLive.Form, :edit
+
+      live "/tasks", TaskLive.Index, :index
+      live "/tasks/new", TaskLive.Form, :new
+      live "/tasks/:id", TaskLive.Show, :show
+      live "/tasks/:id/edit", TaskLive.Form, :edit
+
+      live "/expenses", ExpenseLive.Index, :index
+      live "/expenses/new", ExpenseLive.Form, :new
+      live "/expenses/:id", ExpenseLive.Show, :show
+      live "/expenses/:id/edit", ExpenseLive.Form, :edit
+
+      live "/incomes", IncomeLive.Index, :index
+      live "/incomes/new", IncomeLive.Form, :new
+      live "/incomes/:id", IncomeLive.Show, :show
+      live "/incomes/:id/edit", IncomeLive.Form, :edit
+
+      live "/clients", ClientLive.Index, :index
+      live "/clients/new", ClientLive.Form, :new
+      live "/clients/:id", ClientLive.Show, :show
+      live "/clients/:id/edit", ClientLive.Form, :edit
+
+      live "/products", ProductLive.Index, :index
+      live "/products/new", ProductLive.Form, :new
+      live "/products/:id", ProductLive.Show, :show
+      live "/products/:id/edit", ProductLive.Form, :edit
 
       live "/analytics", AnalyticsLive, :index
     end
