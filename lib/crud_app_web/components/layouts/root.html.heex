@@ -11,10 +11,112 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       @media print {
-        .no-print { display: none !important; }
-        .print\:p-0 { padding: 0 !important; }
-        body { background: white !important; }
-        .card { border: none !important; box-shadow: none !important; }
+        /* High-Fidelity PDF Reset */
+        @page {
+          margin: 1cm;
+          size: auto;
+        }
+
+        *, *::before, *::after {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          overflow: visible !important;
+        }
+        
+        html, body {
+          background: white !important;
+          color: black !important;
+          width: 100% !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        /* Hide UI Chrome */
+        .no-print, header, footer, nav, .drawer-side, .btn, .divider, .toast, .alert {
+          display: none !important;
+        }
+
+        /* Layout Flattening */
+        .drawer, .drawer-content, main {
+          display: block !important;
+          position: static !important;
+          width: 100% !important;
+          height: auto !important;
+          min-height: auto !important;
+          overflow: visible !important;
+        }
+
+        .mx-auto, .max-w-7xl, .max-w-2xl {
+          max-width: none !important;
+          width: 100% !important;
+          margin: 0 !important;
+        }
+
+        /* Force Vertical Stack for Analytics */
+        .grid {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 20px !important;
+        }
+
+        /* Stats Grid Fix - daisyUI specific */
+        .stats {
+          display: flex !important;
+          flex-direction: column !important;
+          width: 100% !important;
+          border: 1px solid #eee !important;
+          background: #f8fafc !important;
+        }
+        .stat {
+          border-bottom: 1px solid #eee !important;
+          width: 100% !important;
+          display: block !important;
+        }
+
+        /* Card and Chart Formatting */
+        .card {
+          break-inside: avoid;
+          page-break-inside: avoid;
+          display: block !important;
+          width: 100% !important;
+          border: 1px solid #eee !important;
+          margin-bottom: 30px !important;
+          background: white !important;
+        }
+
+        .card-body {
+          padding: 20px !important;
+        }
+
+        /* Iframe / Metabase Solution */
+        .metabase-container {
+          display: block !important;
+          width: 100% !important;
+          height: auto !important;
+          min-height: 2500px !important; /* Extremely high to capture all charts */
+          overflow: visible !important;
+          border: none !important;
+        }
+
+        iframe {
+          width: 100% !important;
+          height: 2500px !important;
+          border: none !important;
+          display: block !important;
+        }
+
+        /* Chart Canvas */
+        canvas {
+          width: 100% !important;
+          height: auto !important;
+          max-height: 500px !important;
+        }
+
+        /* Background Colors */
+        .bg-base-100, .bg-base-200 { background: #f8fafc !important; }
+        .text-primary { color: #b32025 !important; }
       }
     </style>
     <script>
@@ -32,32 +134,105 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
+
+      // PDF Print Preparation
+      window.addEventListener("phx:prepare-print", () => {
+        document.documentElement.classList.add("is-printing");
+        setTimeout(() => {
+          window.print();
+          document.documentElement.classList.remove("is-printing");
+        }, 300);
+      });
     </script>
   </head>
-  <body>
-    <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+  <body class="min-h-screen flex flex-col bg-base-100 text-base-content antialiased">
+    <div class="drawer">
+      <input id="erp-sidebar" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col min-h-screen">
+        
+        <header class="sticky top-0 z-50 w-full border-b border-base-300 bg-base-100/80 backdrop-blur-md">
+          <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-4">
+              <%= if @current_scope do %>
+                <label for="erp-sidebar" aria-label="open sidebar" class="btn btn-square btn-ghost hover:bg-base-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </label>
+              <% end %>
+              <.link navigate={~p"/"} class="flex flex-col group">
+                <div class="flex items-center text-4xl font-black tracking-tighter">
+                  <span class="text-[#b32025]">REAL</span><span class="text-[#252525] dark:text-gray-100">SME</span>
+                </div>
+                <div class="flex items-center w-full mt-[-2px]">
+                  <div class="h-1 bg-[#252525] dark:bg-gray-100 flex-grow"></div>
+                  <div class="h-1 bg-[#b32025] flex-grow"></div>
+                </div>
+                <span class="text-[0.65rem] font-bold tracking-[0.3em] text-[#252525] dark:text-gray-100 mt-1 uppercase text-center w-full">Solutions</span>
+              </.link>
+            </div>
+            
+            <ul class="flex items-center gap-6 text-sm font-medium">
+              <%= if @current_scope do %>
+                <li class="hidden lg:flex items-center gap-2 text-base-content/50 border-r border-base-300 pr-6 mr-2">
+                  {@current_scope.user.email}
+                  <span class="badge badge-sm badge-outline opacity-50">
+                    Sign-ins: {@current_scope.user.sign_in_count}
+                  </span>
+                </li>
+                <li>
+                  <.link href={~p"/users/settings"} class="hover:text-primary transition-colors">Settings</.link>
+                </li>
+                <li>
+                  <.link href={~p"/users/log-out"} method="delete" class="btn btn-sm btn-outline btn-error">Log out</.link>
+                </li>
+              <% else %>
+                <li>
+                  <.link href={~p"/users/log-in"} class="hover:text-primary transition-colors font-semibold">Log in</.link>
+                </li>
+                <li>
+                  <.link href={~p"/users/register"} class="btn btn-sm btn-primary text-white shadow-md hover:shadow-lg transition-all rounded-sm">Get Started</.link>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </header>
+
+        <main class="flex-grow flex flex-col relative">
+          {@inner_content}
+        </main>
+      </div>
+      
+      <!-- Hamburger Sidebar UI -->
       <%= if @current_scope do %>
-        <li>
-          {@current_scope.user.email}
-        </li>
-        <li>
-          <.link href={~p"/users/settings"}>Settings</.link>
-        </li>
-        <li>
-          <.link href={~p"/users/log-out"} method="delete">Log out</.link>
-        </li>
-      <% else %>
-        <li>
-          <.link href={~p"/users/register"}>Register</.link>
-        </li>
-        <li>
-          <.link href={~p"/users/log-in"}>Log in</.link>
-        </li>
+        <div class="drawer-side z-[100]">
+          <label for="erp-sidebar" aria-label="close sidebar" class="drawer-overlay"></label>
+          <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content flex flex-col gap-2 border-r border-base-300 pt-8">
+            <div class="px-4 mb-6">
+              <div class="text-2xl font-black tracking-tighter">
+                <span class="text-[#b32025]">REAL</span><span class="text-[#252525] dark:text-gray-100">SME</span>
+              </div>
+              <div class="text-xs font-bold tracking-widest opacity-50 uppercase mt-1">ERP Modules</div>
+            </div>
+            
+            <li><.link navigate={~p"/records"} class="text-base"><.icon name="hero-rectangle-group" class="w-5 h-5 mr-3 text-primary" /> Dashboard</.link></li>
+            <li><.link navigate={~p"/analytics"} class="text-base"><.icon name="hero-presentation-chart-line" class="w-5 h-5 mr-3 text-primary" /> Analytics</.link></li>
+            
+            <div class="divider my-2"></div>
+            
+            <li class="menu-title text-primary uppercase text-xs font-bold mt-2">Operations</li>
+            <li><.link navigate={~p"/tasks"} class="text-base"><.icon name="hero-clipboard-document-check" class="w-5 h-5 mr-3 opacity-70" /> Tasks</.link></li>
+            
+            <li class="menu-title text-primary uppercase text-xs font-bold mt-4">Accounting</li>
+            <li><.link navigate={~p"/expenses"} class="text-base"><.icon name="hero-banknotes" class="w-5 h-5 mr-3 opacity-70" /> Expenses</.link></li>
+            <li><.link navigate={~p"/incomes"} class="text-base"><.icon name="hero-arrow-trending-up" class="w-5 h-5 mr-3 opacity-70" /> Incomes</.link></li>
+            
+            <li class="menu-title text-primary uppercase text-xs font-bold mt-4">Business</li>
+            <li><.link navigate={~p"/clients"} class="text-base"><.icon name="hero-users" class="w-5 h-5 mr-3 opacity-70" /> Clients</.link></li>
+            <li><.link navigate={~p"/products"} class="text-base"><.icon name="hero-cube" class="w-5 h-5 mr-3 opacity-70" /> Products / Services</.link></li>
+          </ul>
+        </div>
       <% end %>
-    </ul>
-    {@inner_content}
+    </div>
   </body>
 </html>
