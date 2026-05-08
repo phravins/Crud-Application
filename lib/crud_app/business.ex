@@ -77,7 +77,9 @@ defmodule CrudApp.Business do
   def create_record(%Scope{} = scope, attrs) do
     with {:ok, record = %Record{}} <-
            %Record{}
-           |> Record.changeset(attrs, scope)
+           |> Record.changeset(attrs)
+           |> Ecto.Changeset.put_change(:user_id, scope.user.id)
+           |> Ecto.Changeset.put_change(:user_email, scope.user.email)
            |> Repo.insert() do
       broadcast_record(scope, {:created, record})
       {:ok, record}
@@ -101,7 +103,9 @@ defmodule CrudApp.Business do
 
     with {:ok, record = %Record{}} <-
            record
-           |> Record.changeset(attrs, scope)
+           |> Record.changeset(attrs)
+           |> Ecto.Changeset.put_change(:user_id, scope.user.id)
+           |> Ecto.Changeset.put_change(:user_email, scope.user.email)
            |> Repo.update() do
       broadcast_record(scope, {:updated, record})
       {:ok, record}
@@ -140,8 +144,13 @@ defmodule CrudApp.Business do
 
   """
   def change_record(%Scope{} = scope, %Record{} = record, attrs \\ %{}) do
-    true = record.user_id == scope.user.id
+    if record.user_id do
+      true = record.user_id == scope.user.id
+    end
 
-    Record.changeset(record, attrs, scope)
+    record
+    |> Record.changeset(attrs)
+    |> Ecto.Changeset.put_change(:user_id, scope.user.id)
+    |> Ecto.Changeset.put_change(:user_email, scope.user.email)
   end
 end
