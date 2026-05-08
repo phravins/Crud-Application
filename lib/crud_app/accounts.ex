@@ -173,6 +173,10 @@ defmodule CrudApp.Accounts do
   Generates a session token.
   """
   def generate_user_session_token(user) do
+    # Increment sign-in count atomatically
+    from(u in User, where: u.id == ^user.id)
+    |> Repo.update_all(inc: [sign_in_count: 1])
+
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
     token
