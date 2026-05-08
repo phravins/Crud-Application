@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :crud_app, CrudApp.Repo,
-  username: "postgres",
-  password: "Real0@123",
-  hostname: "localhost",
-  database: "metabasedb",
+  username: System.get_env("DB_USER"),
+  password: System.get_env("DB_PASS"),
+  hostname: System.get_env("DB_HOST"),
+  database: System.get_env("DB_NAME"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -23,7 +23,7 @@ config :crud_app, CrudAppWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "60fLBPh7pNlpqrESg0dwNcoxpEUf/Ctbsic5VYGa3y4m5U0e0/sfIp78WMLxuz1F",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:crud_app, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:crud_app, ~w(--watch)]}
@@ -88,5 +88,59 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
-# Disable swoosh api client as it is only required for production adapters.
-config :swoosh, :api_client, false
+# ---------------------------------------------------------------------------
+# Mailer / Email Configuration (Development)
+# ---------------------------------------------------------------------------
+#
+# Choose ONE of the options below by setting the matching environment variables
+# before starting the server.  No new Hex dependencies are required — all
+# options use the already-installed `req` HTTP client.
+#
+# ── Option 1: Brevo (formerly Sendinblue) ──────────────────────────────────
+#   export EMAIL_PROVIDER=brevo
+#   export BREVO_API_KEY="xkeysib-xxxxxxxxxxxxxxxxxxxx"
+#   export SMTP_FROM_EMAIL="your@email.com"
+#
+# ── Option 2: Mailgun ──────────────────────────────────────────────────────
+#   export EMAIL_PROVIDER=mailgun
+#   export MAILGUN_API_KEY="key-xxxxxxxxxxxxxxxxxxxxxxxxxx"
+#   export MAILGUN_DOMAIN="mg.yourdomain.com"
+#   export SMTP_FROM_EMAIL="your@email.com"
+#
+# ── Option 3: Postmark ─────────────────────────────────────────────────────
+#   export EMAIL_PROVIDER=postmark
+#   export POSTMARK_API_KEY="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   export SMTP_FROM_EMAIL="your@email.com"
+#
+# ── No env vars set → Local mailbox preview at http://localhost:4000/dev/mailbox
+# ---------------------------------------------------------------------------
+
+case System.get_env("EMAIL_PROVIDER") do
+  "brevo" ->
+    config :crud_app, CrudApp.Mailer,
+      adapter: Swoosh.Adapters.Brevo,
+      api_key: System.get_env("BREVO_API_KEY")
+
+    config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  "mailgun" ->
+    config :crud_app, CrudApp.Mailer,
+      adapter: Swoosh.Adapters.Mailgun,
+      api_key: System.get_env("MAILGUN_API_KEY"),
+      domain: System.get_env("MAILGUN_DOMAIN")
+
+    config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  "postmark" ->
+    config :crud_app, CrudApp.Mailer,
+      adapter: Swoosh.Adapters.Postmark,
+      api_key: System.get_env("POSTMARK_API_KEY")
+
+    config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  _ ->
+    # Default: Local adapter — view emails at http://localhost:4000/dev/mailbox
+    config :crud_app, CrudApp.Mailer, adapter: Swoosh.Adapters.Local
+    config :swoosh, :api_client, false
+end
+
